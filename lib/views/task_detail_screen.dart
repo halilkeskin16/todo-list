@@ -41,46 +41,48 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     isLandscape = MediaQuery.of(context).size.width > 700;
     return Scaffold(
       appBar: AppBar(title: const Text("Task Details")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: "Title",
-                border: OutlineInputBorder(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              TextField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: "Title",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: "Description",
-                border: OutlineInputBorder(),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: "Description",
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
               ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              "Created: ${widget.task.date!.toString().substring(0, 16)}",
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            Text(
-              "Status: ${widget.task.isCompleted ? "Completed" : "Pending"}",
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: (){
-                _updateTask();
-                Get.back();
-              },
-              child: const Text("Update Task"),
-            ),
-          ],
+              const SizedBox(height: 10),
+              Text(
+                "Created: ${widget.task.date!.toString().substring(0, 16)}",
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+              Text(
+                "Status: ${widget.task.isCompleted ? "Completed" : "Pending"}",
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: (){
+                  _updateTask();
+                  Get.back();
+                },
+                child: const Text("Update Task"),
+              ),
+            ],
+          ),
         ),
       ),
     );

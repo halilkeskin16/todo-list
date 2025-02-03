@@ -14,10 +14,10 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'To-Do App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home:  HomeScreen(),
+      theme: ThemeData.light(), 
+      darkTheme: ThemeData.dark(),
+      themeMode: ThemeMode.system,
+      home: HomeScreen(),
     );
   }
 }

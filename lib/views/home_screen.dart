@@ -9,15 +9,35 @@ enum TaskFilter { all, done, pending }
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
-
   final Controller controller = Get.put(Controller());
 
   @override
   Widget build(BuildContext context) {
     bool isLandscape = MediaQuery.of(context).size.width > 700;
-
+    bool isLight = controller.isLight.value;
     return Scaffold(
-      appBar: AppBar(title: const Text('Your To-Do List')),
+      appBar: AppBar(
+        title: const Text('Your To-Do List'),
+        leading: IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () {
+            controller.loadAllTasks();
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: Obx(
+              () => controller.isLight.value ? const Icon(Icons.light_mode) : const Icon(Icons.dark_mode),
+            ),
+            onPressed: () {
+              isLight = !isLight;
+              controller.changeThemeMode();
+              Get.changeThemeMode(isLight ? ThemeMode.light : ThemeMode.dark);
+              print(isLight);
+            },
+          ),
+        ],
+      ),
       body: isLandscape
           ? Row(
               children: [
@@ -34,17 +54,14 @@ class HomeScreen extends StatelessWidget {
                 ),
                 Expanded(
                   flex: 3,
-                  child: Container(
-                    color: Colors.grey[200],
-                    child: GetBuilder<Controller>(
-                      builder: (controller) {
-                        return controller.selectedTask != null
-                            ? TaskDetailScreen(task: controller.selectedTask!)
-                            : const Center(
-                                child: Text('Select a task to see details'),
-                              );
-                      },
-                    ),
+                  child: GetBuilder<Controller>(
+                    builder: (controller) {
+                      return controller.selectedTask != null
+                          ? TaskDetailScreen(task: controller.selectedTask!)
+                          : const Center(
+                              child: Text('Select a task to see details' , style: TextStyle(),),
+                            );
+                    },
                   ),
                 ),
               ],
@@ -59,12 +76,14 @@ class HomeScreen extends StatelessWidget {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          controller.changeAddButtonPressed();
           final result = await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const AddTaskScreen()),
           );
           if (result == true) {
             controller.loadAllTasks();
+            controller.changeAddButtonPressed();
           }
         },
         child: const Icon(Icons.add),
@@ -76,6 +95,7 @@ class HomeScreen extends StatelessWidget {
     return GetBuilder<Controller>(
       builder: (controller) {
         return ToggleButtons(
+          
           isSelected: [
             controller.taskFilter == TaskFilter.all,
             controller.taskFilter == TaskFilter.done,
@@ -87,8 +107,8 @@ class HomeScreen extends StatelessWidget {
           },
           borderRadius: BorderRadius.circular(12),
           selectedColor: Colors.white,
-          fillColor: Colors.blue,
-          color: Colors.black,
+          fillColor: controller.isLight.value ? Colors.blue : Colors.blueGrey,
+          color: controller.isLight.value ? Colors.black : Colors.white,
           constraints: const BoxConstraints(minWidth: 100, minHeight: 40),
           children: const [
             Text("All"),
@@ -126,7 +146,7 @@ class HomeScreen extends StatelessWidget {
                 itemCount: filteredTasks.length,
                 itemBuilder: (context, index) {
                   final task = filteredTasks[index];
-                  return Container(
+                  return Container(   
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: task.isCompleted ? Colors.green[100] : Colors.white,
@@ -137,7 +157,7 @@ class HomeScreen extends StatelessWidget {
                       contentPadding: const EdgeInsets.all(8),
                       title: Text(
                         task.title,
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.black),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,11 +166,12 @@ class HomeScreen extends StatelessWidget {
                             task.description,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 17),
+                            style: const TextStyle(fontSize: 17,
+                            color: Colors.black),
                           ),
                           Text(
                             task.date!.toString().substring(0, 16),
-                            style: const TextStyle(fontSize: 12),
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ],
                       ),

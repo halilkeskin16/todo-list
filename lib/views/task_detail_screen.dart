@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/models/task.dart';
 import 'package:todo_app/service/controller/controller.dart';
-import 'package:todo_app/views/home_screen.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   final Task task;

@@ -158,6 +158,7 @@ class HomeScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Checkbox(
+                            activeColor: Colors.green,
                             value: task.isCompleted,
                             onChanged: (value) {
                               task.isCompleted = value!;

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:todo_app/models/task.dart';
-import 'package:todo_app/service/database.dart';
+import 'package:todo_app/service/controller/controller.dart';
+import 'package:todo_app/views/home_screen.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   final Task task;
@@ -14,12 +16,16 @@ class TaskDetailScreen extends StatefulWidget {
 class _TaskDetailScreenState extends State<TaskDetailScreen> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
+  final Controller controller = Get.find<Controller>();
   bool isLandscape = false;
-  DatabaseHelper databaseHelper = DatabaseHelper();
+
   @override
   void initState() {
     super.initState();
+    _titleController = TextEditingController(text: widget.task.title);
+    _descriptionController = TextEditingController(text: widget.task.description);
   }
+
   Future<void> _updateTask() async {
     Task updatedTask = Task(
       id: widget.task.id,
@@ -28,24 +34,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       date: widget.task.date, 
       isCompleted: widget.task.isCompleted, 
     );
-    await DatabaseHelper().updateTask(updatedTask);
-    //ÇALIŞMIYOR 
-    isLandscape ? AlertDialog(
-      title: const Text("Success"),
-      content: const Text("Task updated successfully"),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("OK"),
-        ),
-      ],
-    ) : Navigator.pop(context , true);
+    await controller.updateTask(updatedTask);
   }
 
   @override
   Widget build(BuildContext context) {
-    _titleController = TextEditingController(text: widget.task.title);
-    _descriptionController = TextEditingController(text: widget.task.description);
     isLandscape = MediaQuery.of(context).size.width > 700;
     return Scaffold(
       appBar: AppBar(title: const Text("Task Details")),
@@ -57,15 +50,17 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(labelText: "Title",
-              border: OutlineInputBorder(),
+              decoration: const InputDecoration(
+                labelText: "Title",
+                border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _descriptionController,
-              decoration: const InputDecoration(labelText: "Description",
-              border: OutlineInputBorder(),
+              decoration: const InputDecoration(
+                labelText: "Description",
+                border: OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
@@ -78,8 +73,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               "Status: ${widget.task.isCompleted ? "Completed" : "Pending"}",
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
+            const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _updateTask,
+              onPressed: (){
+                _updateTask();
+                Get.back();
+              },
               child: const Text("Update Task"),
             ),
           ],

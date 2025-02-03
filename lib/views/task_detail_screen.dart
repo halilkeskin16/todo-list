@@ -15,12 +15,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   bool isLandscape = false;
-
+  DatabaseHelper databaseHelper = DatabaseHelper();
   @override
   void initState() {
     super.initState();
   }
-
   Future<void> _updateTask() async {
     Task updatedTask = Task(
       id: widget.task.id,
@@ -30,7 +29,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       isCompleted: widget.task.isCompleted, 
     );
     await DatabaseHelper().updateTask(updatedTask);
-
     //ÇALIŞMIYOR 
     isLandscape ? AlertDialog(
       title: const Text("Success"),
@@ -42,7 +40,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         ),
       ],
     ) : Navigator.pop(context , true);
-     
   }
 
   @override

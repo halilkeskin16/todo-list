@@ -18,7 +18,8 @@ class _HomeScreenState extends State<HomeScreen> {
   TaskFilter taskFilter = TaskFilter.all;
   Task? selectedTask;
   bool isLandscape = false;
-
+  double width = 0;
+  double height = 0;
   @override
   void initState() {
     super.initState();
@@ -91,6 +92,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildToggleButtons() {
+    if (isLandscape) {
+      width = MediaQuery.of(context).size.width / 8;
+      height = MediaQuery.of(context).size.height / 20;
+    }
+    else {
+      width = MediaQuery.of(context).size.width / 3.5;
+      height = MediaQuery.of(context).size.height / 20;
+    }
     return ToggleButtons(
       isSelected: [
         taskFilter == TaskFilter.all,
@@ -106,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
       selectedColor: Colors.white,
       fillColor: Colors.blue,
       color: Colors.black,
-      constraints: const BoxConstraints(minWidth: 100, minHeight: 40),
+      constraints: BoxConstraints(minWidth: width, minHeight: height),
       children: const [
         Text("All"),
         Text("Done"),

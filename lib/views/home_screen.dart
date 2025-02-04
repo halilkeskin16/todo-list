@@ -14,7 +14,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isLandscape = MediaQuery.of(context).size.width > 700;
-    bool isLight = getController.isLight.value;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your To-Do List'),
@@ -25,17 +24,18 @@ class HomeScreen extends StatelessWidget {
           },
         ),
         actions: [
-          IconButton(
-            icon: Obx(
-              () => getController.isLight.value
+          Obx(
+            () => IconButton(
+              icon: getController.isLight.value
                   ? const Icon(Icons.light_mode)
                   : const Icon(Icons.dark_mode),
+              onPressed: () {
+                getController.changeThemeMode();
+                Get.changeThemeMode(getController.isLight.value
+                    ? ThemeMode.light
+                    : ThemeMode.dark);
+              },
             ),
-            onPressed: () {
-              isLight = !isLight;
-              getController.changeThemeMode();
-              Get.changeThemeMode(isLight ? ThemeMode.light : ThemeMode.dark);
-            },
           ),
         ],
       ),
@@ -55,10 +55,11 @@ class HomeScreen extends StatelessWidget {
                 ),
                 Expanded(
                   flex: 3,
-                  child: GetBuilder<Controller>(
-                    builder: (controller) {
+                  child: Obx(
+                    () {
                       return getController.selectedTask.value != null
-                          ? TaskDetailScreen(task: getController.selectedTask.value!)
+                          ? TaskDetailScreen(
+                              task: getController.selectedTask.value!)
                           : const Center(
                               child: Text(
                                 'Select a task to see details',
@@ -122,20 +123,20 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget taskListWidget() {
-    return GetBuilder<Controller>(
-      builder: (controller) {
-        List<Task> filteredTasks = [];
-        switch (controller.taskFilter) {
+    return Obx(
+      () {
+        List<Task> filteredTasks;
+        switch (getController.taskFilter) {
           case TaskFilter.all:
-            filteredTasks = controller.tasks;
+            filteredTasks = getController.tasks;
             break;
           case TaskFilter.done:
             filteredTasks =
-                controller.tasks.where((task) => task.isCompleted).toList();
+                getController.tasks.where((task) => task.isCompleted).toList();
             break;
           case TaskFilter.pending:
             filteredTasks =
-                controller.tasks.where((task) => !task.isCompleted).toList();
+                getController.tasks.where((task) => !task.isCompleted).toList();
             break;
         }
         return filteredTasks.isEmpty
@@ -162,7 +163,7 @@ class HomeScreen extends StatelessWidget {
                       contentPadding: const EdgeInsets.all(8),
                       title: Text(
                         task.title,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w500,
                             color: Colors.black),
@@ -192,11 +193,11 @@ class HomeScreen extends StatelessWidget {
                             value: task.isCompleted,
                             onChanged: (value) {
                               task.isCompleted = value!;
-                              controller.updateTask(task);
+                              getController.updateTask(task);
                             },
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete),
+                            icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () {
                               showDialog(
                                 context: context,
@@ -215,9 +216,12 @@ class HomeScreen extends StatelessWidget {
                                       TextButton(
                                         onPressed: () {
                                           Navigator.pop(context);
-                                          controller.deleteTask(task.id!);
+                                          getController.deleteTask(task.id!);
                                         },
-                                        child: const Text('Delete'),
+                                        child: const Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
                                       ),
                                     ],
                                   );
@@ -228,9 +232,9 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                       onTap: () {
+                        getController.selectedTaskDetails(task);
                         if (MediaQuery.of(context).size.width > 700) {
-                          controller.selectedTaskDetails(task);
-                          controller.update();
+                          getController.update();
                         } else {
                           Navigator.push(
                             context,
@@ -239,7 +243,7 @@ class HomeScreen extends StatelessWidget {
                                     TaskDetailScreen(task: task)),
                           ).then((value) {
                             if (value == true) {
-                              controller.loadAllTasks();
+                              getController.loadAllTasks();
                             }
                           });
                         }
@@ -251,5 +255,4 @@ class HomeScreen extends StatelessWidget {
       },
     );
   }
-
 }

@@ -33,6 +33,7 @@
       );
       await controller.updateTask(updatedTask);
     }
+    
 
     @override
     Widget build(BuildContext context) {
@@ -66,12 +67,14 @@
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "Created: ${widget.task.date!.toString().substring(0, 16)}",
+                  "Created: ${controller.selectedTask.value?.date.toString().substring(0, 16) ?? "N/A"}",
                   style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
-                Text(
-                  "Status: ${widget.task.isCompleted ? "Completed" : "Pending"}",
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                Obx(
+                  () => Text(
+                    "Status: ${controller.selectedTask.value?.isCompleted == true ? "Completed" : "Pending"}",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 ElevatedButton(

@@ -5,13 +5,10 @@ import 'package:todo_app/service/database.dart';
 import 'package:todo_app/views/home_screen.dart';
 
 class Controller extends GetxController {
-  List<Task> tasks = [];
+  RxList<Task> tasks = <Task>[].obs;
   TaskFilter taskFilter = TaskFilter.all;
-  Rx<Task?> selectedTask = Rx<Task?>(null); // selectedTask artık Rx oldu
+  Rx<Task?> selectedTask = Rx<Task?>(null);
   RxBool isLight = true.obs;
-  RxBool addButtonPressed = false.obs;
-  String title = "";
-  String description = "";
 
   @override
   void onInit() {
@@ -20,8 +17,8 @@ class Controller extends GetxController {
   }
 
   Future<void> loadAllTasks() async {
-    tasks = await DatabaseHelper().getTasks();
-    update();
+    List<Task> loadedTasks = await DatabaseHelper().getTasks();
+    tasks.assignAll(loadedTasks);
   }
 
   Future<void> deleteTask(int id) async {
@@ -39,9 +36,8 @@ class Controller extends GetxController {
     loadAllTasks();
   }
 
-  Future<void> changeThemeMode() async {
+  void changeThemeMode() {
     isLight.value = !isLight.value;
-    update();
   }
 
   void selectedTaskDetails(Task task) {

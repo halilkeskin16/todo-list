@@ -9,31 +9,32 @@ enum TaskFilter { all, done, pending }
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
-  final Controller controller = Get.put(Controller());
+  final Controller getController = Get.find();
 
   @override
   Widget build(BuildContext context) {
     bool isLandscape = MediaQuery.of(context).size.width > 700;
-    bool isLight = controller.isLight.value;
+    bool isLight = getController.isLight.value;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your To-Do List'),
         leading: IconButton(
           icon: const Icon(Icons.refresh),
           onPressed: () {
-            controller.loadAllTasks();
+            getController.loadAllTasks();
           },
         ),
         actions: [
           IconButton(
             icon: Obx(
-              () => controller.isLight.value ? const Icon(Icons.light_mode) : const Icon(Icons.dark_mode),
+              () => getController.isLight.value
+                  ? const Icon(Icons.light_mode)
+                  : const Icon(Icons.dark_mode),
             ),
             onPressed: () {
               isLight = !isLight;
-              controller.changeThemeMode();
+              getController.changeThemeMode();
               Get.changeThemeMode(isLight ? ThemeMode.light : ThemeMode.dark);
-              print(isLight);
             },
           ),
         ],
@@ -56,10 +57,13 @@ class HomeScreen extends StatelessWidget {
                   flex: 3,
                   child: GetBuilder<Controller>(
                     builder: (controller) {
-                      return controller.selectedTask != null
-                          ? TaskDetailScreen(task: controller.selectedTask!)
+                      return getController.selectedTask.value != null
+                          ? TaskDetailScreen(task: getController.selectedTask.value!)
                           : const Center(
-                              child: Text('Select a task to see details' , style: TextStyle(),),
+                              child: Text(
+                                'Select a task to see details',
+                                style: TextStyle(),
+                              ),
                             );
                     },
                   ),
@@ -76,14 +80,12 @@ class HomeScreen extends StatelessWidget {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          controller.changeAddButtonPressed();
           final result = await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const AddTaskScreen()),
           );
           if (result == true) {
-            controller.loadAllTasks();
-            controller.changeAddButtonPressed();
+            getController.loadAllTasks();
           }
         },
         child: const Icon(Icons.add),
@@ -95,7 +97,6 @@ class HomeScreen extends StatelessWidget {
     return GetBuilder<Controller>(
       builder: (controller) {
         return ToggleButtons(
-          
           isSelected: [
             controller.taskFilter == TaskFilter.all,
             controller.taskFilter == TaskFilter.done,
@@ -129,10 +130,12 @@ class HomeScreen extends StatelessWidget {
             filteredTasks = controller.tasks;
             break;
           case TaskFilter.done:
-            filteredTasks = controller.tasks.where((task) => task.isCompleted).toList();
+            filteredTasks =
+                controller.tasks.where((task) => task.isCompleted).toList();
             break;
           case TaskFilter.pending:
-            filteredTasks = controller.tasks.where((task) => !task.isCompleted).toList();
+            filteredTasks =
+                controller.tasks.where((task) => !task.isCompleted).toList();
             break;
         }
         return filteredTasks.isEmpty
@@ -146,18 +149,23 @@ class HomeScreen extends StatelessWidget {
                 itemCount: filteredTasks.length,
                 itemBuilder: (context, index) {
                   final task = filteredTasks[index];
-                  return Container(   
+                  return Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: task.isCompleted ? Colors.green[100] : Colors.white,
+                      color:
+                          task.isCompleted ? Colors.green[100] : Colors.white,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(8),
                       title: Text(
                         task.title,
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.black),
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,12 +174,13 @@ class HomeScreen extends StatelessWidget {
                             task.description,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 17,
-                            color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 17, color: Colors.black),
                           ),
                           Text(
                             task.date!.toString().substring(0, 16),
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -194,7 +203,8 @@ class HomeScreen extends StatelessWidget {
                                 builder: (context) {
                                   return AlertDialog(
                                     title: const Text('Delete Task'),
-                                    content: const Text('Are you sure you want to delete?'),
+                                    content: const Text(
+                                        'Are you sure you want to delete?'),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
@@ -219,16 +229,14 @@ class HomeScreen extends StatelessWidget {
                       ),
                       onTap: () {
                         if (MediaQuery.of(context).size.width > 700) {
-                          if (controller.selectedTask?.id == task.id) {
-                            controller.selectedTask = null;
-                          } else {
-                            controller.selectedTask = task;
-                          }
+                          controller.selectedTaskDetails(task);
                           controller.update();
                         } else {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => TaskDetailScreen(task: task)),
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    TaskDetailScreen(task: task)),
                           ).then((value) {
                             if (value == true) {
                               controller.loadAllTasks();
@@ -243,4 +251,5 @@ class HomeScreen extends StatelessWidget {
       },
     );
   }
+
 }

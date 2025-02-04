@@ -7,9 +7,12 @@ import 'package:todo_app/views/home_screen.dart';
 class Controller extends GetxController {
   List<Task> tasks = [];
   TaskFilter taskFilter = TaskFilter.all;
-  Task? selectedTask;
+  Rx<Task?> selectedTask = Rx<Task?>(null); // selectedTask artık Rx oldu
   RxBool isLight = true.obs;
   RxBool addButtonPressed = false.obs;
+  String title = "";
+  String description = "";
+
   @override
   void onInit() {
     super.onInit();
@@ -40,8 +43,8 @@ class Controller extends GetxController {
     isLight.value = !isLight.value;
     update();
   }
-  Future<void> changeAddButtonPressed() async {
-    addButtonPressed.value = !addButtonPressed.value;
-    update();
+
+  void selectedTaskDetails(Task task) {
+    selectedTask.value = task;
   }
 }
